@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -78,7 +79,47 @@ public class OnlineCoursesAnalyzer {
 
     //3
     public Map<String, List<List<String>>> getCourseListOfInstructor() {
-        return null;
+        Map<String, Set<String>> res0 = new HashMap<>(), res1 = new HashMap<>();
+        Set<String>allInstructors = new HashSet<>();
+        for (Course course: courses) {
+            Set<String> courseInfo = new HashSet<>();
+            String [] tmp = course.instructors.split(", ");
+            for (String instructor: tmp) {
+                allInstructors.add(instructor);
+                courseInfo.add(instructor);
+                if (res0.get(instructor) == null) res0.put(instructor, new HashSet<>());
+                if (res1.get(instructor) == null) res1.put(instructor, new HashSet<>());
+            }
+             for (String instructor: tmp) {
+                if (courseInfo.size() == 1) {
+                    Set<String> now = res0.get(instructor);
+                    now.add(course.title);
+                    res0.put(instructor, now);
+                } else {
+                    Set<String> now = res1.get(instructor);
+                    now.add(course.title);
+                    res1.put(instructor, now);
+                }
+            }
+        }
+        Map<String, List<List<String>>> res = new HashMap<>();
+        for (String instructor: allInstructors) {
+            List<String> list0 = new ArrayList<>(), list1 = new ArrayList<>();
+            Set<String> tmp = res0.get(instructor);
+            for (String courseTitle: tmp) {
+                list0.add(courseTitle);
+            }
+            tmp = res1.get(instructor);
+            for (String courseTitle: tmp) {
+                list1.add(courseTitle);
+            }
+            Collections.sort(list0);
+            Collections.sort(list1);
+            List<List<String>> w = new ArrayList<>();
+            w.add(list0); w.add(list1);
+            res.put(instructor, w);
+        }
+        return res;
     }
 
     //4

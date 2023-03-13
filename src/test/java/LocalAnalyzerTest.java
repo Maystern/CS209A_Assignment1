@@ -85,12 +85,15 @@ public class LocalAnalyzerTest {
             String[] strings = row.split(" == ");
             expectedList.add((Item<K, V>) new Item<>(strings[0], strings[1]));
         }
+
         if (objMap.size() != expectedList.size()) {
             return false;
         }
+
         for (Map.Entry<K, V> entry : objMap.entrySet()) {
             Item<K, V> item = (Item<K, V>) new Item<>(entry.getKey().toString(), entry.getValue().toString());
             if (!expectedList.contains(item)) {
+                System.out.println(item);
                 return false;
             }
         }
