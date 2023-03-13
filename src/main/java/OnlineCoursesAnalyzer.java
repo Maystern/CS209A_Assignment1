@@ -1,7 +1,6 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -185,9 +184,58 @@ public class OnlineCoursesAnalyzer {
 
     //6
     public List<String> recommendCourses(int age, int gender, int isBachelorOrHigher) {
-        return null;
+        Map<String, Course> numberToTitle = new HashMap<>();
+        Set<String> allCourse = new HashSet<>();
+        Map<String, Double> similarityValue = new HashMap<>();
+        Map<String, Double> totValue = new HashMap<>();
+        Map<String, Double> medianAgeTotal = new HashMap<>();
+        Map<String, Double> maleTotal = new HashMap<>();
+        Map<String, Double> percentDegreeTotal = new HashMap<>();
+        for (Course course: courses) {
+            allCourse.add(course.number);
+            Course tmp = numberToTitle.get(course.number);
+            if (tmp == null || tmp.launchDate.before(course.launchDate)) {
+                numberToTitle.put(course.number, course);
+            }
+            if (totValue.get(course.number) == null) totValue.put(course.number, 0.0);
+            totValue.put(course.number, totValue.get(course.number) + 1);
+            if (medianAgeTotal.get(course.number) == null) medianAgeTotal.put(course.number, 0.0);
+            medianAgeTotal.put(course.number, medianAgeTotal.get(course.number) + course.medianAge);
+            if (maleTotal.get(course.number) == null) maleTotal.put(course.number, 0.0);
+            maleTotal.put(course.number, maleTotal.get(course.number) + course.percentMale);
+            if (percentDegreeTotal.get(course.number) == null) percentDegreeTotal.put(course.number, 0.0);
+            percentDegreeTotal.put(course.number, percentDegreeTotal.get(course.number) + course.percentDegree);
+        }
+        for (String courseNumber: allCourse) {
+            double avgMedianAge = medianAgeTotal.get(courseNumber) / totValue.get(courseNumber);
+            double avgMale = maleTotal.get(courseNumber) / totValue.get(courseNumber);
+            double avgPercentDegree = percentDegreeTotal.get(courseNumber) / totValue.get(courseNumber);
+            double val = (age - avgMedianAge) * (age - avgMedianAge) + (100.0 * gender - avgMale) * (100.0 * gender - avgMale)
+                    + (isBachelorOrHigher * 100.0 - avgPercentDegree) * (isBachelorOrHigher * 100.0 - avgPercentDegree);
+            similarityValue.put(courseNumber, val);
+        }
+        List<Map.Entry<String, Double>> list = new ArrayList<Map.Entry<String, Double>>(similarityValue.entrySet());
+        Collections.sort(list, new Comparator<Map.Entry<String, Double>>() {
+            @Override
+            public int compare(Map.Entry<String, Double> o1, Map.Entry<String, Double> o2) {
+                if (o1.getValue() < o2.getValue()) return -1;
+                else if (o1.getValue() > o2.getValue()) return 1;
+                else return o2.getKey().compareTo(o1.getKey());
+            }
+        });
+        List<String>res = new ArrayList<>();
+        Set<String> fine = new HashSet<>();
+        int cnt = 0;
+        for (Map.Entry<String, Double> e: list) {
+            String tmp = numberToTitle.get(e.getKey()).title;
+            if (fine.contains(tmp)) continue;
+            res.add(tmp);
+            cnt++;
+            fine.add(tmp);
+            if (cnt == 10) break;
+        }
+        return res;
     }
-
 }
 
 class Course {
