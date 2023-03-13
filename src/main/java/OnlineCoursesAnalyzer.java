@@ -124,7 +124,47 @@ public class OnlineCoursesAnalyzer {
 
     //4
     public List<String> getCourses(int topK, String by) {
-        return null;
+        Map<String, Course> allCourse = new HashMap<>();
+        for (Course course: courses) {
+            Course tmp = allCourse.get(course.title);
+            if (tmp == null) allCourse.put(course.title, course);
+            else {
+                if (by.equals("hours")) {
+                    if (tmp.totalHours < course.totalHours)
+                        allCourse.put(course.title, course);
+                } else {
+                    if (tmp.participants < course.participants)
+                        allCourse.put(course.title, course);
+                }
+            }
+        }
+        allCourse = allCourse.entrySet().stream().sorted((item1, item2) -> {
+            int compare;
+            if (by.equals("hours")) {
+                double tmp = item1.getValue().totalHours - item2.getValue().totalHours;
+                if (tmp > 0) compare = -1;
+                else if (tmp < 0) compare = 1;
+                else compare = 0;
+            } else {
+                int tmp = item1.getValue().participants - item2.getValue().participants;
+                if (tmp > 0) compare = -1;
+                else if (tmp < 0) compare = 1;
+                else compare = 0;
+            }
+            if (compare == 0) compare = item1.getKey().compareTo(item2.getKey());
+            return compare;
+        }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+        List<String>res = new ArrayList<>();
+        Set keySet = allCourse.keySet();
+        Iterator it = keySet.iterator();
+        while (it.hasNext()) {
+            String tmp = (String) it.next();
+            res.add(tmp);
+        }
+         List<String> ans = new ArrayList<>();
+         for (int i = 0; i < topK; i++)
+             ans.add(res.get(i));
+         return ans;
     }
 
     //5
