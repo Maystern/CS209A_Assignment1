@@ -1,0 +1,10 @@
+The Analytics Edge
+Supply Chain Design
+Big Data and Social Physics
+Data Analysis for Genomics: Matrix Algebra and Linear Models
+Supply Chain and Logistics Fundamentals
+Introduction to State Space Control
+Mechanical Behavior of Materials: Time Dependent Behavior and Failure
+Discrete-Time Signal Processing
+Introduction to Computational Thinking and Data Science
+Atomic and Optical Physics: Coherence
