@@ -169,7 +169,18 @@ public class OnlineCoursesAnalyzer {
 
     //5
     public List<String> searchCourses(String courseSubject, double percentAudited, double totalCourseHours) {
-        return null;
+        Set<String> res = new HashSet<>();
+        for (Course course: courses) {
+            if (course.subject.toLowerCase().contains(courseSubject.toLowerCase()) && course.percentAudited >= percentAudited && course.totalHours <= totalCourseHours) {
+                res.add(course.title);
+            }
+        }
+        List<String> ans = new ArrayList<>();
+        for (String str: res) {
+            ans.add(str);
+        }
+        Collections.sort(ans);
+        return ans;
     }
 
     //6
