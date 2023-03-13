@@ -3,6 +3,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -57,8 +58,22 @@ public class OnlineCoursesAnalyzer {
 
     //2
     public Map<String, Integer> getPtcpCountByInstAndSubject() {
-
-        return null;
+        Map<String, Integer> res = new HashMap<>();
+        for (Course course : courses) {
+            StringBuffer tmp = new StringBuffer();
+            tmp.append(course.institution);
+            tmp.append("-"); tmp.append(course.subject);
+            Integer num = res.get(tmp.toString());
+            if (num == null) res.put(tmp.toString(), course.participants);
+            else res.put(tmp.toString(), num + course.participants);
+        }
+        return res.entrySet().stream().sorted((item1, item2) -> {
+            int compare = item2.getValue().compareTo(item1.getValue());
+            if (compare == 0) {
+                compare = item1.getKey().compareTo(item2.getKey());
+            }
+            return compare;
+        }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
     }
 
     //3
